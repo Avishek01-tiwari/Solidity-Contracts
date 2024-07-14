@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.26;
+
+contract simplestorage {
+    //boolean, uint, int, address, bytes, strings
+    uint /*public*/ favoriteNumber;
+    //if no number is assigned to favoriteNumber, then it itself assigned at 0
+    struct People{
+        uint256 favoriteNumber;
+        string name;
+    }
+
+    mapping (string => uint256) public nametonumber;
+
+    People [] public people ;
+
+    function store(uint256 _favoriteNumber) public virtual {
+        favoriteNumber=_favoriteNumber;
+        retrieve();
+    }
+
+    function retrieve () public view returns (uint256){
+        return favoriteNumber;
+    }
+    function addperson (string memory _name, uint _favoriteNumber) public 
+    //addperson keeps pushing the entered data of name and number in people array
+    {
+        People memory newpeople= People(_favoriteNumber,_name);
+        people.push(newpeople);
+        //people array keeps storing the provided data here and becuzs it is public the stored data will get displayed
+        nametonumber [_name]= _favoriteNumber;
+        //mapping connects strings to uint256 like avi=>3
+    }
+}
+contract newcontract1{
+    uint date;
+    function callvalue (uint256 _date) public  {
+        date= _date;
+        get();
+    }
+    function get() public view returns (uint256) {
+       return  date;
+    }
+}
+contract newcontract2{
+    string name;
+}
