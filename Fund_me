@@ -1,0 +1,68 @@
+---solidity
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.26;
+import "./prizeconvertor.sol";
+ 
+contract FundMe {
+    using priceconvert for uint256;
+   // uint256 public amount;
+    uint256 public constant miniUSD=5e18 /* 5*1e18 */;
+    address[] public funders;
+    mapping(address sender =>uint256 value) public addresstovalue;
+    address public immutable owner;
+
+    constructor(){
+        owner=msg.sender;
+    }
+// constructorand immutable helps in reducing gas price by saving data in bytes instead of memory
+    function fund() public payable{
+        require(msg.value.getconvert()>=miniUSD, "didn't send enough eth");
+        //funder
+        funders.push(msg.sender);
+        addresstovalue[msg.sender]=addresstovalue[msg.sender]+msg.value;
+        //a=0, b=1;
+        //a=a+b; a= msg.sender, b=msg.value, b keeps changing;
+        // amount=msg.value;
+        // get();
+    }
+
+    function withdraw() public onlyowner{
+        
+        for(uint256 fundersIndex=0; fundersIndex<=funders.length;fundersIndex++)
+        {
+            address funder= funders[fundersIndex];
+        // funder me funders[array ke index, ke acc address store hoge] store hoge starting from 0 to jitne fund aage
+            addresstovalue[funder]=0;
+        // ab har address jo starting se store hua hai unse associated values will be 0 now.
+        }
+        funders= new address[](0);
+        //this resets the funders array back to 0 index, as all the funds are withdrawed
+        //ways to send ETH to sender or send the withdrawn amount are- Transfer, Send, Call
+        //Transfer
+        /*payable(msg.sender).transfer(address(this).balance);*/
+        //Send
+        bool SendSuccess=payable(msg.sender).send(address(this).balance);
+        require(SendSuccess, "withdrawal fail");
+        //Call
+        (bool CallSuccess,/*another datatype*/)=payable(msg.sender).call{value:address(this).balance}(""/*u can call any function here in these ""*/);
+        require(CallSuccess, "Call failed");
+        // call is most preffered among them
+    }
+    modifier onlyowner(){
+        require(msg.sender==owner, "owner can only withdraw");
+        _;
+        //here placing this _; up or down in a modifier defines what should execute first a function or a modifier  
+    }
+    // function get() public view returns (uint256){
+    //     return  (amount/10 ** 18) ;
+    // }
+    receive() external  payable { 
+        fund();
+    }
+
+    fallback() external payable {
+        fund();
+     }
+    
+}
+---
