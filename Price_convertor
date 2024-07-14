@@ -1,0 +1,24 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.26;
+
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+library priceconvert{
+    function getprize() internal  view returns (uint256){
+        //Address- USD/ETH
+        //ABI
+        AggregatorV3Interface prizefeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
+        (,int answer,,,)= prizefeed.latestRoundData();
+        return uint256 (answer*1e10);
+    }
+    
+    function getconvert(uint256 ethamount ) internal  view returns (uint256){
+        uint256 ethprize=getprize();
+        uint256 EthamonutInUSD=(ethprize*ethamount)/ 1e10;
+        return EthamonutInUSD;
+    }
+
+    function getversion() internal view returns (uint256){
+        return AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306).version();
+
+    }
+}
